@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput } from 'react-native';
 import GuessInput from './GuessInput';
 
 const GameScreen = ({ navigation, correctNumber, attemptsLeft, setAttemptsLeft, generateNumber, repeat }) => {
@@ -10,6 +10,18 @@ const GameScreen = ({ navigation, correctNumber, attemptsLeft, setAttemptsLeft, 
   useEffect(() => {
     generateNumber(repeat);
   }, []);
+
+  useEffect(() => {
+    const handleEnterKey = (event) => {
+      if (event.key === 'Enter') {
+        handleGuess();
+      }
+    };
+    document.addEventListener('keydown', handleEnterKey);
+    return () => {
+      document.removeEventListener('keydown', handleEnterKey);
+    };
+  }, [guess, attemptsLeft, correctNumber, hint]);
 
   const handleGuess = () => {
     if (guess.length !== 4) {
@@ -71,8 +83,15 @@ const GameScreen = ({ navigation, correctNumber, attemptsLeft, setAttemptsLeft, 
       <View style={styles.hintContainer}>
         {renderHint()}
       </View>
+      <Text style={styles.reminder}>
+        {repeat ? '¡Recuerda: Puede contener digitos repetidos!' : '¡Recuerda: No puede contener digitos repetidos!'}
+      </Text>
       <Text style={styles.text}>Intentos restantes: {attemptsLeft}</Text>
       <GuessInput guess={guess} setGuess={setGuess} />
+      <Text style={styles.pista}>
+          Pista: los números "Correctos" están en la posición correcta, los "Regulares" forman parte del número
+          pero en otra posición y los "Incorrectos" no forman parte del número.
+      </Text>
       <TouchableOpacity
         style={styles.button}
         onPress={handleGuess}
@@ -95,7 +114,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 10,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingTop: 50,
+    paddingHorizontal: 20,
     backgroundColor: '#FFFFFF'
   },
   title: {
@@ -119,6 +140,22 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     fontWeight: 'bold',
     color: '#BF40BF'
+  },
+  reminder: {
+    fontSize: 16,
+    fontFamily: 'monospace',
+    fontWeight: 'semi-bold',
+    color: '#BF40BF',
+    marginBottom: 20,
+  },
+  pista: {
+    fontSize: 16,
+    fontFamily: 'monospace',
+    fontWeight: 'semi-bold',
+    color: '#4CBB17',
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   button: {
     backgroundColor: '#4CBB17',
